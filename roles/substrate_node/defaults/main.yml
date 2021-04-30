@@ -1,0 +1,5 @@
+---
+node_binary_dir: /usr/local/bin
+node_listen_port: 30333
+node_rpc_port: 9933
+node_ws_port: 9944

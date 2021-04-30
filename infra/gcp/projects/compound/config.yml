@@ -1,0 +1,28 @@
+prefix: gcp
+project: compound
+ssh_user: SSH_USER
+ssh_public_key: "SSH_PUBLIC_KEY"
+
+instances:
+  compound_validator:
+    instance_type: n2-standard-3
+    boot_disk_image: ubuntu-os-cloud/ubuntu-2004-lts
+    boot_disk_size: 20
+    extended_disk_type: pd-ssd
+    extended_disk_size: 50
+    extended_disk_name: sdb
+    machines:
+      validator1:
+        region: us-west1
+        zone: us-west1-a
+  compound_node:
+    instance_type: n2-standard-3
+    boot_disk_image: ubuntu-os-cloud/ubuntu-2004-lts
+    boot_disk_size: 20
+    extended_disk_type: pd-ssd
+    extended_disk_size: 50
+    extended_disk_name: sdb
+    machines:
+      node1:
+        region: us-west1
+        zone: us-west1-a

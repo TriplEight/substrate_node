@@ -1,0 +1,84 @@
+---
+- hosts: localhost
+  gather_facts: no
+
+  tasks:
+  - name: Check if variable is specified
+    fail:
+      msg: "Basket name should be declared. -e basket_name=BASKET_NAME"
+    failed_when: basket_name is not defined
+
+  - name: Set some facts
+    set_fact:
+      addr: >-
+            {% for host,params in hostvars.items() %}
+            {%- if params['basket'] == basket_name and params['role'] == 'border' -%}
+            {{ params['ansible_host'] }}
+            {%- endif -%}
+            {% endfor %}
+      nodes: >-
+            {
+            {%- set ns = namespace(port = 31300) -%}
+            {%- for host,params in hostvars.items() -%}
+            {%- if params['basket'] == basket_name and params['role'] == 'validator' -%}
+            {% set ns.port = ns.port + 1 -%}
+            '{{ host }}':{'addr':'{{ params['internal_addr'] }}','port':'{{ ns.port }}'}{%- if not loop.last %},{% endif %}
+            {%- endif -%}
+            {% endfor %}}
+
+  - name: Create builder host
+    add_host:
+      name: "dummy"
+      hostname: "dummy"
+      public_addr: "{{ addr }}"
+      nodes: '{{ nodes }}'
+
+- hosts: all
+  become: true
+  become_method: sudo
+  gather_facts: no
+  vars:
+    secure_validator: yes
+    mtail_logs_path: /var/log/nginx/access.log
+    server_endpoint: "{{ hostvars['dummy']['public_addr'] }}"
+    validator_public_port: "{{ hostvars['dummy']['nodes'][inventory_hostname]['port'] }}" 
+
+  roles:
+  - role: nginx
+    when: role == 'border' and basket == basket_name
+  - role: mtail
+    when: role == 'border' and basket == basket_name
+  - role: substrate_node
+    when: role == 'validator' and basket == basket_name
+
+  tasks:
+  - name: Nginx
+    block:
+    - name: Copy nginx secure validator conf file
+      copy:
+        src: border/border.conf
+        dest: /etc/nginx/conf.d/
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Create streams dir
+      file:
+        path: /etc/nginx/streams-enabled
+        state: directory
+
+    - name: Create proxy service file
+      template:
+        src: border/proxy.conf.j2
+        dest: /etc/nginx/streams-enabled/proxy.conf
+    when: role == 'border' and basket == basket_name
+
+  - name: Copy mtail config
+    copy:
+      src: mtail/nginx.mtail
+      dest: "{{ mtail_home_dir }}/progs/nginx.mtail"
+      owner: "{{ mtail_user }}"
+      group: "{{ mtail_group }}"
+      mode: 0640
+    notify: restart-mtail
+    when: role == 'border' and basket == basket_name

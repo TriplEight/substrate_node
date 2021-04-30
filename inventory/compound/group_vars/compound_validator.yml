@@ -1,0 +1,17 @@
+---
+node_relaychain_extra_args:
+- '--validator'
+- '--pruning=archive'
+- '--prometheus-external'
+- '--prometheus-port 9615'
+
+node_service_env: 
+- '"MINER=ETH_MINER_ADDR"'
+- '"KEYRING_TYPE=IN_MEMORY"'
+- '"ETH_KEY=ETH_SIGNER_KEY"'
+- '"ETH_KEY_ID=my_eth_key_id"'
+- '"ETH_RPC_URL=INFURA_PATH"'
+- '"OPF_URL=https://prices.compound.finance/coinbase"'
+
+bootnodes:
+- /dns/brr-alice.compound.cash/tcp/30333/p2p/12D3KooWCdDZiHogARXgUTce1BCdg26dog6kvPaBSW6293cYdz4b

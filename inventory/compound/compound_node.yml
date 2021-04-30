@@ -1,0 +1,7 @@
+compound_node:
+  vars:
+    ansible_user: SSH_USER
+  hosts:
+    validator1:
+      ansible_host: xxx
+      internal_addr: xxx

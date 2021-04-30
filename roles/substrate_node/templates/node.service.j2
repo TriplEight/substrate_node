@@ -1,0 +1,57 @@
+[Unit]
+Description={{ node_binary_name }} node service
+Requires=network-online.target
+After=network-online.target
+[Service]
+Type=simple
+User={{ node_user }}
+Group={{ node_group }}
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+{% if node_service_env is defined %}
+{% for i in node_service_env %}
+Environment={{ i }}
+{% endfor %}
+{% endif %}
+ExecStartPre=/bin/sleep 30
+ExecStart={{ node_binary_dir }}/{{ node_binary_name }} \
+  {% if disable_node_name is not defined %}
+  --name "{%- if region is defined %} ({{ region }}) {% endif -%}{{ inventory_hostname }}" \
+  {% endif %}
+  {% if node_parachain_args is defined %}
+  {% if para_chain is defined %}
+  --chain={{ para_chain }} \
+  {% endif %}
+  {% for i in  node_parachain_args %}
+  {{ i }} \
+  {% endfor %}
+  -- \
+  {% endif %}
+  --chain={{ relay_chain }} \
+  {% if node_public_addr is defined %}
+  --public-addr={{ node_public_addr }} \
+  {% endif %}
+  {% if node_relaychain_extra_args is defined %}
+  {% for i in  node_relaychain_extra_args %}
+  {{ i }} \
+  {% endfor %}
+  {% endif %}
+  {% if static_reserved_nodes is defined %}
+  {% for i in static_reserved_nodes %}
+  --reserved-nodes {{ i }} \
+  {% endfor %}
+  {% endif %}
+  {% if bootnodes is defined %}
+  {% for i in bootnodes %}
+  --bootnodes {{ i }} \
+  {% endfor %}
+  {% endif %}
+  --no-mdns 
+Restart=no
+SyslogIdentifier={{ node_binary_name }}-node
+StandardOutput=append:{{ node_log_dir }}/{{ node_binary_name }}.log
+StandardError=append:{{ node_log_dir }}/{{ node_binary_name }}.log
+LimitNOFILE=infinity
+LimitMEMLOCK=infinity
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,119 @@
+---
+- name: Prepare env
+  block:
+  - name: Create group
+    group:
+      name: "{{ node_group }}"
+      state: present
+      system: true
+    ignore_errors: yes
+
+  - name: Create user
+    user:
+      name: "{{ node_user }}"
+      groups: "{{ node_group }}"
+      append: true
+      shell: /usr/sbin/nologin
+      system: true
+      create_home: true
+      home: "{{ node_home_dir }}"
+    ignore_errors: yes
+
+  - name: "Create log directory"
+    file:
+      path: "{{ node_log_dir }}"
+      state: directory
+      mode: 0640
+      owner: "{{ node_user }}"
+
+  - name: Copy logrotate file
+    template:
+      src: node.logrotate.j2
+      dest: /etc/logrotate.d/{{ node_binary_name }}
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Create log directory
+    file:
+      path: "{{ node_log_dir }}"
+      state: directory
+      mode: 0640
+      owner: "{{ node_user }}"
+
+  - name: Mount database volume(trying with LABEL)
+    mount:
+      path: "{{ node_home_dir }}"
+      src: "LABEL={{ node_db_disk_label }}"
+      opts: rw,relatime
+      state: mounted
+      fstype: ext4
+    register: result
+    ignore_errors: yes
+
+  - name: "Create a ext4 filesystem on {{ extended_disk_name }}"
+    filesystem:
+      fstype: ext4
+      dev: "/dev/{{ extended_disk_name }}"
+    when: result.failed == true and extended_disk_name is defined
+
+  - name: "Mount database volume(trying with {{ extended_disk_name }})"
+    mount:
+      path: "{{ node_home_dir }}"
+      src: "/dev/{{ extended_disk_name }}"
+      opts: rw,relatime
+      state: mounted
+      fstype: ext4
+    register: result
+    ignore_errors: yes
+    when: result.failed == true and extended_disk_name is defined
+
+  - name: "Set permissons to {{ node_home_dir }}"
+    file:
+      path: "{{ node_home_dir }}"
+      owner: "{{ node_user }}"
+      group: "{{ node_group }}"
+      mode: '0750'
+      recurse: yes
+
+  - name: Delete 'keystore' and 'network' folders
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+    - "{{ node_home_dir }}/.local/share/{{ node_binary_name }}/chains/{{ node_chain_name }}/keystore"
+    - "{{ node_home_dir }}/.local/share/{{ node_binary_name }}/chains/{{ node_chain_name }}/network"
+    ignore_errors: yes
+  tags: install
+
+- name: "Install/uprade node"
+  block:
+  - name: Stopping node
+    systemd:
+      state: stopped
+      name: "{{ node_binary_name}}-node"
+
+  - name: Download latest release
+    get_url:
+      url: "{{ node_binary_url }}"
+      dest: "{{ node_binary_dir }}/{{ node_binary_name }}_latest"
+
+  - name: Make local copy of previous version
+    copy:
+      src: "{{ node_binary_dir }}/{{ node_binary_name }}"
+      dest: "{{ node_binary_dir }}/{{ node_binary_name }}_previous"
+      remote_src: yes
+    ignore_errors: yes
+
+  - name: Move new version
+    copy:
+      src: "{{ node_binary_dir }}/{{ node_binary_name }}_latest"
+      dest: "{{ node_binary_dir }}/{{ node_binary_name }}"
+      owner: "{{ node_user }}"
+      group: "{{ node_group }}"
+      mode: 0750
+      remote_src: yes
+    notify: restart-node
+  tags: 
+  - install
+  - upgrade

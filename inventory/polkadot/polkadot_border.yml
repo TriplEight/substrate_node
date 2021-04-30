@@ -1,0 +1,15 @@
+polkadot_border:
+  vars:
+    ansible_user: SSH_USER
+  hosts:
+    border1:
+      ansible_host: xxx
+      internal_addr: xxx
+      role: border
+      basket: basket1
+    border2:
+      ansible_host: xxx
+      internal_addr: xxx
+      role: border
+      basket: basket2
+

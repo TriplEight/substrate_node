@@ -1,0 +1,6 @@
+{% for host,params in hostvars['dummy']['nodes'].items() %}
+server {
+  listen 0.0.0.0:{{ params['port'] }};
+  proxy_pass {{ params['addr'] }}:30333;
+}
+{% endfor %}

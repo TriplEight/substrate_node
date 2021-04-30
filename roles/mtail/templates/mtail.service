@@ -1,0 +1,21 @@
+[Unit]
+Description=mtail
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+Restart=on-failure
+WorkingDirectory={{ mtail_home_dir }}
+ExecStart={{ mtail_binary_dir }}/mtail \
+    --address 0.0.0.0 --port 9617 \
+    --emit_prog_label=false --alsologtostderr \
+    --progs {{ mtail_home_dir }}/progs \
+    --logs {{ mtail_logs_path }}
+
+User={{ mtail_user }}
+Group={{ mtail_group }}
+
+[Install]
+WantedBy=multi-user.target
+

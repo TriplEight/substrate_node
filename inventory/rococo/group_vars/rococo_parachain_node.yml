@@ -1,0 +1,10 @@
+---
+node_binary_url: ROCOCO_BINARY_URL
+node_binary_name: rococo-collator
+node_home_dir: /home/rococo
+node_log_dir: /var/log/rococo
+node_user: rococo
+node_group: rococo
+para_chain: /home/rococo/rococo-para.json
+
+disable_node_name: true

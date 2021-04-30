@@ -1,0 +1,48 @@
+---
+- name: Getting current block before stop
+  local_action:
+    module: uri
+    url: "{{ node_rpc_url }}"
+    method: POST
+    body_format: json
+    return_content: yes
+    body: {"id":1, "jsonrpc":"2.0", "method": "system_syncState"}
+  run_once: yes
+  register: result_before
+  become: no
+
+- name: Stopping node(safe)
+  systemd:
+    state: stopped
+    name: "{{ node_binary_name}}-node"
+
+- name: Pause for 15s
+  pause:
+    seconds: 30
+
+- name: Getting current block before start
+  local_action:
+    module: uri
+    url: "{{ node_rpc_url }}"
+    method: POST
+    body_format: json
+    return_content: yes
+    body: {"id":1, "jsonrpc":"2.0", "method": "system_syncState"}
+  run_once: yes
+  register: result_after
+  become: no
+
+- name: Calculate diff between blocks
+  set_fact:
+    diff: "{{ result_after.json['result']['currentBlock'] | int - result_before.json['result']['currentBlock'] | int}}"
+
+- debug:
+    msg: "Diff between blocks is {{ diff }}"
+
+- name: Starting node(safe)
+  systemd:
+    state: started
+    daemon_reload: yes
+    name: "{{ node_binary_name }}-node"
+  when: diff | int > 3
+  notify: dynamic-reserved-nodes

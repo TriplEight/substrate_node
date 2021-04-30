@@ -1,0 +1,39 @@
+prefix: gcp
+project: polkadot
+ssh_user: SSH_USER
+ssh_public_key: "SSH_PUBLIC_KEY"
+
+instances:
+  polkadot_validator:
+    instance_type: n2-standard-3
+    boot_disk_image: ubuntu-os-cloud/ubuntu-2004-lts
+    boot_disk_size: 10
+    extended_disk_type: pd-ssd
+    extended_disk_size: 50
+    extended_disk_name: sdb
+    role: validator
+    machines:
+      validator1:
+        basket: basket1
+        region: us-west1
+        zone: us-west1-a
+      validator2:
+        basket: basket2
+        region: us-west3
+        zone: us-west3-a
+  polkadot_border:
+    instance_type: n2-standard-3
+    boot_disk_image: ubuntu-os-cloud/ubuntu-2004-lts
+    boot_disk_size: 20
+    role: border
+    machines:
+      border1:
+        basket: basket1
+        region: us-west1
+        zone: us-west1-a
+      border2:
+        basket: basket2
+        region: us-west3
+        zone: us-west3-a
+
+

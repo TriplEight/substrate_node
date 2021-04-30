@@ -1,0 +1,62 @@
+---
+- name: Create mtail group
+  group:
+    name: "{{ mtail_group }}"
+    state: present
+    system: true
+  ignore_errors: yes
+
+- name: Create mtail user
+  user:
+    name: "{{ mtail_user }}"
+    groups: "{{ mtail_group }}"
+    append: true
+    shell: /usr/sbin/nologin
+    system: true
+    create_home: true
+    home: "{{ mtail_home_dir }}"
+  ignore_errors: yes
+
+- name: Create directory
+  file:
+    path: "{{ mtail_home_dir }}/{{ item }}"
+    state: directory
+    mode: 0750
+    owner: "{{ mtail_user }}"
+    group: "{{ mtail_group }}"
+  with_items:
+    - progs
+    - logs
+
+- name: Download archive
+  get_url:
+    url: "{{ mtail_url }}"
+    dest: "{{ mtail_home_dir }}/mtail.tar.gz"
+    owner: "{{ mtail_user }}"
+    group: "{{ mtail_group }}"
+    mode: 0750
+
+- name: Unarchive mtail
+  unarchive:
+    remote_src: yes
+    src: "{{ mtail_home_dir }}/mtail.tar.gz"
+    dest: "{{ mtail_home_dir }}"
+
+- name: Move mtail binary
+  copy:
+    src: "{{ mtail_home_dir }}/mtail"
+    dest: "{{ mtail_binary_dir }}/mtail"
+    owner: "{{ mtail_user }}"
+    group: "{{ mtail_group }}"
+    mode: 0750
+    remote_src: yes
+  notify: restart-mtail
+
+- name: Generate mtail service file
+  template:
+    src: mtail.service
+    dest: /etc/systemd/system/mtail.service
+    owner: "{{ mtail_user }}"
+    group: "{{ mtail_group }}"
+    mode: 0640
+  notify: restart-mtail

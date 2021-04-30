@@ -1,0 +1,8 @@
+---
+- name: Restart mtail service
+  systemd:
+    name: mtail
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+  listen: restart-mtail

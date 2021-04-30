@@ -1,0 +1,46 @@
+rococo_parachain_node:
+  vars:
+    ansible_user: SSH_USER
+  hosts:
+    scaleway-rococo-parachain-node1:
+      ansible_host: xxx
+      internal_addr: xxx
+      node_parachain_args:
+      - '--parachain-id 200'
+      - '--bootnodes=/ip4/COLLATOR_NODE1/tcp/40334/p2p/12D3KooWRsWf3ek1KhHp4NefaMWTzT8hqukqLF1WVMa6Dtdmad55'
+      - '--port 40334'
+      - '--rpc-port 9934'
+      - '--ws-port 9944'
+      - '--rpc-cors all'
+      - '--bob'
+      node_relaychain_extra_args:
+      - '--port 30333'
+      - '--execution wasm'
+      - '--rpc-port 9933'
+      - '--ws-port 9977'
+      reserved_peers:
+      - 'RELAY_CHAIN_NODE1_IP'
+      - 'RELAY_CHAIN_NODE2_IP'
+      - 'RELAY_CHAIN_NODE2_IP'
+    scaleway-rococo-parachain-node2:
+      ansible_host: xxx
+      internal_addr: xxx
+      node_parachain_args:
+      - '--parachain-id 300'
+      - '--bootnodes=/ip4/COLLATOR_NODE2/tcp/40334/p2p/12D3KooWRsWf3ek1KhHp4NefaMWTzT8hqukqLF1WVMa6Dtdmad55'
+      - '--port 40334'
+      - '--rpc-port 9934'
+      - '--ws-port 9944'
+      - '--rpc-cors all'
+      - '--bob'
+      node_relaychain_extra_args:
+      - '--port 30333'
+      - '--execution wasm'
+      - '--rpc-port 9933'
+      - '--ws-port 9977'
+      reserved_peers:
+      - 'RELAY_CHAIN_NODE1_IP'
+      - 'RELAY_CHAIN_NODE2_IP'
+      - 'RELAY_CHAIN_NODE2_IP'
+
+  

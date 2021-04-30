@@ -1,0 +1,20 @@
+counter request_count            by upstream_addr,status as "nginx_request_count"
+counter upstream_bytes_sent      by upstream_addr,status as "nginx_bytes_sent"
+counter upstream_bytes_received  by upstream_addr,status as "nginx_bytes_received"
+
+/^/ +
+/(?P<upstream_addr>[0-9A-Za-z\.\-:]+) / +
+/(?P<status>\d{3}) / +
+/(?P<bytes_sent>\d+) / +
+/(?P<bytes_received>\d+)/ +
+/$/ {
+    $bytes_received == "0" {
+    request_count[$upstream_addr]["500"]++
+    upstream_bytes_sent[$upstream_addr]["500"] += $bytes_sent
+    upstream_bytes_received[$upstream_addr]["500"] += $bytes_received
+    } else {
+    request_count[$upstream_addr][$status]++
+    upstream_bytes_sent[$upstream_addr][$status] += $bytes_sent
+    upstream_bytes_received[$upstream_addr][$status] += $bytes_received
+    }
+}

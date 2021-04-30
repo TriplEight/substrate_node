@@ -1,0 +1,10 @@
+---
+relaychain_specs:
+- http://1.2.3.4/rococo-relay.json
+
+parachain_specs:
+- http://1.2.3.4/rococo-para.json
+
+relay_chain: /home/polkadot/rococo-relay.json
+
+para_chain: /home/rococo/rococo-para.json

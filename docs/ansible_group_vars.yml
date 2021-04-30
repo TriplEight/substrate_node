@@ -1,0 +1,30 @@
+##Description of all variables used by ansible.
+
+relay_chain: polkadot  #Using for templating of node.service(key --chain).
+para_chain: trick #Using for templating of node.service(key --chain).
+
+relaychain_specs:  #(list) json file(s) which contain spec files. In case using chain-spec file variable chain should be defined with path where file stored (optional). 
+parachain_specs: #(list) json file(s) which contain spec files. In case using chain-spec file variable chain should be defined with path where file stored (optional). 
+
+node_binary_url: https://github.com/paritytech/polkadot/releases/download/v0.8.30/polkadot  #From where binary can be downloaded.
+node_binary_name: polkadot  #Name of binary file. 
+node_chain_name: polkadot  #Using ONLY for deleting keystore and network folders during install.
+
+node_db_disk_label: CHAIN_DB  #Extended disk label (optional).
+node_service_env:  #(list) `Environment=` parameter in systemd service file. You can define as more as you need (optional).
+
+node_relaychain_extra_args:  #(list) Arguments which will be passed to binary. NOTE: key `--name` is out of extra args and uses ansible_hostname (optional). 
+node_parachain_args:  #(list) Arguments which will be passed to binary of collator/parachain node section (optional).
+disable_node_name:  #(boolean) Disables key `--name`, so you can then define name in `node_relaychain_extra_args`. Example `--alice` (optional).
+
+node_user: polkadot  #Username
+node_group: polkadot  #Groupname
+node_log_dir: /var/log/polkadot  #Log dir
+
+node_rpc_url: RPC_URL  #RPC url which allows access for host from which ansible acts(or jumphost), needed for `safe-restart` task (optional).
+
+node_safe_restart: #(boolean)  #Stop node and then start it back only if current block changed by more than 3. Needed `node_rpc_url` (optional)
+
+static_reserved_nodes:  #(list) Reserved nodes. Will be written to systemd service as kay(s) `--reserved-nodes`. Should be like `/ip4/1.2.3.4/tcp/30333/p2p/12xxxxxxxxxxxxxxxx` (optional).
+dynamic_reserved_nodes: #(list) Reserved nodes. Will be defined throug rpc(method: system.AddReservedPeer). Should be an ip address of reserved node (optional).
+

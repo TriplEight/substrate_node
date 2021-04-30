@@ -1,0 +1,19 @@
+---
+- name: Enable and start/restart node(Unsafe)
+  systemd:
+    daemon_reload: yes
+    enabled: yes
+    state: restarted
+    name: "{{ node_binary_name }}-node"
+  when: node_safe_restart is not defined
+  notify: dynamic-reserved-nodes
+  listen: restart-node
+
+- include_tasks: safe_restart.yml
+  when: node_safe_restart is defined
+  listen: restart-node
+
+- include_tasks: dynamic_reserved_nodes.yml
+  when: dynamic_reserved_nodes is defined
+  loop: "{{ dynamic_reserved_nodes }}"
+  listen: dynamic-reserved-nodes

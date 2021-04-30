@@ -1,0 +1,13 @@
+---
+- name: Stopping node(safe)
+  systemd:
+    state: stopped
+    name: "{{ node_binary_name}}-node"
+
+- name: Revert to previous verison
+  copy:
+    src: "{{ node_binary_dir }}/{{ node_binary_name }}_previous"
+    dest: "{{ node_binary_dir }}/{{ node_binary_name }}"
+    remote_src: yes
+  notify: restart-node
+  tags: revert

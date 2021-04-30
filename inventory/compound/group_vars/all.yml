@@ -1,0 +1,20 @@
+---
+chain: /home/compound/chain-spec-raw.json
+
+chain_specs:
+- https://raw.githubusercontent.com/compound-finance/gateway/master/chains/testnet/chain-spec.json
+- https://raw.githubusercontent.com/compound-finance/gateway/master/chains/testnet/chain-spec-raw.json
+
+node_binary_url: BINARY_URL
+node_home_dir: /home/compound
+node_binary_name: gateway
+node_chain_name: staging_testnet
+node_user: compound
+node_group: compound
+node_log_dir: /var/log/compound
+
+node_relaychain_extra_args:
+- '--validator'
+- '--pruning=archive'
+- '--prometheus-external'
+- '--prometheus-port 9615'

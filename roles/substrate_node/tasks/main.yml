@@ -1,0 +1,72 @@
+---
+- import_tasks: install.yml
+  when: "'install' in ansible_run_tags or 'upgrade' in ansible_run_tags"
+
+- import_tasks: session_keys.yml
+  tags: rotate-keys
+  when: "'rotate-keys' in ansible_run_tags"
+
+- import_tasks: revert.yml
+  tags: revert
+  when: "'revert' in ansible_run_tags"
+
+- import_tasks: destroy_db.yml
+  tags: destroy-db
+  when: "'destroy-db' in ansible_run_tags"
+
+- name: Define public addr
+  set_fact:
+    node_public_addr: "/ip4/{{ server_endpoint }}/tcp/{{ validator_public_port }}"
+  when: server_endpoint is defined and validator_public_port is defined
+  tags:
+  - install
+  - upgrade
+  - revert
+
+- name: Download relay chain spec files
+  get_url:
+    url: "{{ item }}"
+    dest: "{{ node_home_dir }}/{{ item | basename }}"
+    owner: "{{ node_user }}"
+    group: "{{ node_group }}"
+  with_items: "{{ relaychain_specs }}"
+  when: relaychain_specs is defined   
+  tags:
+  - install
+  - upgrade
+  - revert
+
+- name: Download para chain spec files
+  get_url:
+    url: "{{ item }}"
+    dest: "{{ node_home_dir }}/{{ item | basename }}"
+    owner: "{{ node_user }}"
+    group: "{{ node_group }}"
+  with_items: "{{ parachain_specs }}"
+  when: parachain_specs is defined
+  tags:
+  - install
+  - upgrade
+  - revert
+
+- name: Create polkadot service file
+  template:
+    src: node.service.j2
+    dest: "/lib/systemd/system/{{ node_binary_name }}-node.service"
+    owner: "{{ node_user }}"
+    group: "{{ node_group }}"
+    mode: 0640
+  notify: restart-node
+  when: "'skip-config' not in ansible_run_tags"
+  tags: 
+  - install
+  - upgrade
+  - revert
+
+- name: Restart validator
+  debug:
+    msg: "Restart validator"
+  changed_when: true
+  notify: restart-node
+  tags: restart
+  when: "'restart' in ansible_run_tags"

@@ -1,0 +1,46 @@
+## General keys which should be defined:
+# `prefix` - part of generated inventory file name (`prifix`_`instance-group`.yml)
+# `project` - part of inventory path(folder) (inventory/`project`/`prifix`_`instance-gruoup`.yml)
+# `ssh_user` - username which will be added as ssh user
+# `ssh_public_key` - public part of key
+# `instances` - entry point
+# `instance_group` - Group of instances. Also part of inventory: group_vars
+# `machines` - set of instances
+# `instance_name` - name of instance
+#
+## Keys which can be be both subkeys of `instance_group` and also declaired in `instance_name` section. For example you can define by exact machine other `instance_type`, so it will be overridden for exact instance.
+##
+## 
+prefix: gcp
+project: compound
+ssh_user: SSH_USER
+ssh_public_key: "SSH_PUBLIC_KEY"
+
+instances:
+  instance_group:
+    instance_type: e2-standard-2 
+    boot_disk_image: ubuntu-os-cloud/ubuntu-2004-lts
+    boot_disk_size: 20
+    extended_disk_type: pd-ssd
+    extended_disk_size: 50
+    extended_disk_name: sdb
+    machines:
+      instance_name:
+        region: us-west1
+        zone: us-west1-a
+  node:
+    instance_type: e2-standard-2
+    boot_disk_image: ubuntu-os-cloud/ubuntu-2004-lts
+    boot_disk_size: 20
+    extended_disk_type: pd-ssd
+    extended_disk_size: 50
+    extended_disk_name: sdb
+    machines:
+      compound-node1:
+        region: us-west1
+        zone: us-west1-a
+      compound-node2:
+        boot_disk_image: ubuntu-os-cloud/ubuntu-1804-lts
+        extended_disk_type: pd-ssd
+        extended_disk_size: 150
+        extended_disk_name: sdc

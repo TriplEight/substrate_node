@@ -1,0 +1,23 @@
+${inventory_name}:
+  vars:
+    ansible_user: ${ansible_user}
+  hosts:
+  %{~ for data in module ~}
+  %{~ if contains(instances[0], data.out_name) ~}
+    ${prefix}-${data.out_name}:
+      ansible_host: ${data.out_ext_ip}
+      internal_addr: ${data.out_int_ip}
+  %{~ if lookup(regions, data.out_name, null) != "none" ~}
+      region: ${lookup(regions, data.out_name, null)}
+  %{~ endif ~}
+  %{~ if lookup(roles, data.out_name, null) != "none" ~}
+      role: ${lookup(roles, data.out_name, null)}
+  %{~ endif ~}
+  %{~ if lookup(baskets, data.out_name, null) != "none" ~} 
+      basket: ${lookup(baskets, data.out_name, null)}
+  %{~ endif ~}
+  %{~ if lookup(disks, data.out_name, null) != "none" ~}
+      extended_disk_name: ${lookup(disks, data.out_name, null)}
+  %{~ endif ~}
+  %{~ endif ~}
+  %{~ endfor ~}

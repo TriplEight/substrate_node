@@ -1,0 +1,9 @@
+- hosts: 'all'
+  become: true
+  become_method: sudo
+  serial:
+  - 3
+  gather_facts: no
+
+  roles:
+  - substrate_node

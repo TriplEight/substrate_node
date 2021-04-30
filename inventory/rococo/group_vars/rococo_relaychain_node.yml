@@ -1,0 +1,10 @@
+---
+node_binary_url: POLKADOT_BUILD_FROM_ROCOCO-V1_BRANCH
+node_binary_name: polkadot
+node_home_dir: /home/polkadot
+node_log_dir: /var/log/polkadot
+node_user: polkadot
+node_group: polkadot
+para_chain: /home/polkadot/rococo-relay.json
+
+disable_node_name: true

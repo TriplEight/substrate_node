@@ -1,0 +1,11 @@
+---
+- name: Stopping node
+  systemd:
+    state: stopped
+    enabled: no
+    name: "{{ node_binary_name}}-node"
+
+- name: Delete DB
+  file:
+    path: "{{ node_home_dir }}/.local"
+    state: absent

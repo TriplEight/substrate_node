@@ -1,0 +1,52 @@
+- hosts: 'all'
+  become: true
+  become_method: sudo
+  gather_facts: no
+
+  vars:
+    nginx_path: /etc/nginx
+    wss_port: 443
+    cert_path: "{{ nginx_path }}/ssl/wss.crt"
+    privatekey_path: "{{ nginx_path }}/ssl/wss.pem"
+    dhparam_path: "{{ nginx_path }}/ssl/dhparam.pem"
+    csr_path: "{{ nginx_path }}/ssl/wss.csr"
+  
+  roles:
+  - nginx
+
+  tasks:
+  - name: Copy nginx secure validator conf file
+    template:
+      src: substrate_wss/wss.conf.j2
+      dest: "{{ nginx_path }}/sites-enabled/wss.conf"
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Create a directory if it does not exist
+    file:
+      path: "{{ nginx_path }}/ssl"
+      state: directory
+      mode: '0755'
+
+  - name: Generate private key
+    openssl_privatekey:
+      path: "{{ privatekey_path }}"
+      size: 2048 
+
+  - name: Generate DH param 
+    openssl_dhparam:
+      path: "{{ dhparam_path }}"
+      size: 2048
+
+  - name: Generate CSR 
+    openssl_csr:
+      path: "{{ csr_path }}"
+      privatekey_path: "{{ privatekey_path }}"
+
+  - name: Generate a Self Signed OpenSSL certificate
+    community.crypto.x509_certificate:
+      path: "{{ cert_path }}"
+      privatekey_path: "{{ privatekey_path }}"
+      csr_path: "{{ csr_path }}"
+      provider: selfsigned

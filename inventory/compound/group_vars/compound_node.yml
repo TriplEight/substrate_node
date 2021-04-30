@@ -1,0 +1,12 @@
+---
+node_relaychain_extra_args:
+- '--validator'
+- '--pruning=archive'
+- '--prometheus-external'
+- '--prometheus-port 9615'
+- "--unsafe-rpc-external"
+- "--rpc-cors all"
+- "--unsafe-ws-external"
+
+bootnodes: 
+- /dns/brr-alice.compound.cash/tcp/30333/p2p/12D3KooWCdDZiHogARXgUTce1BCdg26dog6kvPaBSW6293cYdz4b

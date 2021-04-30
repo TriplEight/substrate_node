@@ -1,0 +1,46 @@
+rococo_relaychain_node:
+  vars:
+    ansible_user: SSH_USER
+  hosts:
+    scaleway-rococo-relaychain-node1:
+      ansible_host: xxx
+      internal_addr: xxx
+      node_relaychain_extra_args:
+      - '--pruning=archive'
+      - '--prometheus-external' 
+      - '--prometheus-port 9615'
+      - '--unsafe-ws-external' 
+      - '--listen-addr=/ip4/0.0.0.0/tcp/30333'
+      - '--unsafe-rpc-external' 
+      - '--rpc-port 9933'
+      - '--rpc-cors all'
+      - '--alice'
+    scaleway-rococo-relaychain-node2:
+      ansible_host: xxx
+      internal_addr: xxx
+      node_relaychain_extra_args:
+      - '--pruning=archive'
+      - '--prometheus-external'
+      - '--prometheus-port 9615'
+      - '--unsafe-ws-external'
+      - '--unsafe-rpc-external'
+      - '--rpc-port 9933'
+      - '--listen-addr=/ip4/0.0.0.0/tcp/30333'
+      - '--rpc-cors all'
+      - '--bob'
+      dynamic_reserved_nodes:
+      - 'NODE1_IP'
+      - 'NODE3_IP'
+    scaleway-rococo-relaychain-node3:
+      ansible_host: EXT_IP
+      internal_addr: INT_IP
+      node_relaychain_extra_args:
+      - '--pruning=archive'
+      - '--prometheus-external'
+      - '--prometheus-port 9615'
+      - '--unsafe-ws-external'
+      - '--listen-addr=/ip4/0.0.0.0/tcp/30333'
+      - '--rpc-port 9933'
+      - '--unsafe-rpc-external'
+      - '--rpc-cors all'
+      - '--charlie'

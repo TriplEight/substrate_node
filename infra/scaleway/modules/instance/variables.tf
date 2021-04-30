@@ -1,0 +1,11 @@
+variable "zone" {}
+variable "instance_name" {}
+variable "instance_type" {}
+variable "boot_disk_size" {}
+variable "boot_disk_image" {}
+variable "snapshot_name" {}
+variable "extended_disk_size" {}
+variable "extended_disk_type" {}
+variable "firewall" {}
+variable "ssh_user" {}
+variable "ssh_public_key" {}
