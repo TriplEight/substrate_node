@@ -52,8 +52,4 @@ resource "scaleway_instance_server" "instance" {
   }
 
   additional_volume_ids   = var.extended_disk_size > 0 ? [ scaleway_instance_volume.extended_disk[0].id ] : null
-
-  provisioner "local-exec" {
-    command = "cd ../../../../ && sleep 30 && ansible-playbook -u root -i ${self.public_ip}, playbooks/bootstrap.yml --tags known-hosts,add-user -e ansible_host=${self.public_ip}"
-  }
 }
